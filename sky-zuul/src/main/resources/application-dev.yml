@@ -1,0 +1,56 @@
+# tomcat
+server:
+  port: 8090
+  tomcat:
+    uri-encoding: UTF-8
+# spring
+spring:
+  application:
+    name: sky-zuul
+
+# eureka
+eurekaServer:
+  host: localhost
+  user: admin
+  password: 123456
+  # eureka端口1
+  port1: 8091
+  # eureka端口2
+  port2: 8092
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eurekaServer.user}:${eurekaServer.password}@${eurekaServer.host}:${eurekaServer.port1}/eureka,http://${eurekaServer.user}:${eurekaServer.password}@${eurekaServer.host}:${eurekaServer.port2}/eureka
+
+# zuul
+zuul:
+  routes:
+    sso:
+      path: /web/**
+      serviceId: sky-web
+    trace:
+      path: /server/**
+      serviceId: sky-server
+   # 不过滤ccokie
+  sensitive-headers: true
+  # 开启重试机制
+  retryable: true
+  host:
+    connect-timeout-millis: 10000
+    socket-timeout-millis: 60000
+
+# hystrix
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
+
+# 日志
+logging:
+  level:
+    root: DEBUG
+  config: classpath:log/logback-spring-dev.xml

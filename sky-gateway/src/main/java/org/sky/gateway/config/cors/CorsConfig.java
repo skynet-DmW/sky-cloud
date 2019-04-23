@@ -1,4 +1,4 @@
-package com.shianxian.gateway.config.cors;
+package org.sky.gateway.config.cors;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -6,7 +6,6 @@ import org.springframework.cloud.gateway.discovery.DiscoveryClientRouteDefinitio
 import org.springframework.cloud.gateway.discovery.DiscoveryLocatorProperties;
 import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;

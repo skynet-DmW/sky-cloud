@@ -2,9 +2,11 @@ package org.sky.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 /**
  * 日期Util类
@@ -13,18 +15,18 @@ import java.util.Date;
 public class DateUtils {
 
 
-    public static SimpleDateFormat yyyyMMddHHmmssFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter yyyyMMddHHmmssFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static SimpleDateFormat yyyyMMddHHmmss = new SimpleDateFormat("yyyyMMddHHmmss");
+    private static final DateTimeFormatter yyyyMMddFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static SimpleDateFormat yyyyMMddFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public static final ZoneId zoneId = ZoneOffset.systemDefault();
 
 
     /**
      * 获取时间戳
      */
-    public static String getTimestamp() {
-        return yyyyMMddHHmmss.format(new Date());
+    public static long getTimestamp() {
+        return LocalDateTime.now().atZone(zoneId).toEpochSecond();
     }
 
 
@@ -34,7 +36,7 @@ public class DateUtils {
      * @param date
      * @return
      */
-    public static String yyyyMMddHHmmssFormat(Date date) {
+    public static String yyyyMMddHHmmssFormat(LocalDateTime date) {
         return yyyyMMddHHmmssFormat.format(date);
     }
 
@@ -44,13 +46,8 @@ public class DateUtils {
      *
      * @return
      */
-    public static Date yyyyMMddHHmmssParse(String date) {
-        try {
-            return yyyyMMddHHmmssFormat.parse(date);
-        } catch (ParseException e) {
-            log.error("格式化时间失败！格式：yyyyMMddHHmmss！{}", e.getMessage(), e);
-        }
-        return null;
+    public static LocalDateTime yyyyMMddHHmmssParse(String date) {
+        return LocalDateTime.parse(date, yyyyMMddHHmmssFormat);
     }
 
 
@@ -60,7 +57,7 @@ public class DateUtils {
      * @param date
      * @return
      */
-    public static String yyyyMMddFormat(Date date) {
+    public static String yyyyMMddFormat(LocalDate date) {
         return yyyyMMddFormat.format(date);
     }
 
@@ -71,14 +68,10 @@ public class DateUtils {
      * @param date
      * @return
      */
-    public static Date yyyyMMddParse(String date) {
-        try {
-            return yyyyMMddFormat.parse(date);
-        } catch (ParseException e) {
-            log.error("格式化时间失败！格式：yyyyMMdd！{}", e.getMessage(), e);
-        }
-        return null;
+    public static LocalDate yyyyMMddParse(String date) {
+        return LocalDate.parse(date, yyyyMMddFormat);
     }
+
 
     /**
      * 通过时间秒毫秒数判断两个时间的间隔
@@ -86,9 +79,10 @@ public class DateUtils {
      * @param endDate
      * @return
      */
-    public static int differentDaysByMillisecond(Date beginDate,Date endDate)
-    {
-        int days = (int) ((endDate.getTime() - beginDate.getTime()) / (1000*3600*24));
+    public static int differentDaysByMillisecond(LocalDateTime beginDate,LocalDateTime endDate) {
+        int days = (int) ((endDate.atZone(zoneId).toEpochSecond() - beginDate.atZone(zoneId).toEpochSecond()) / (3600*24));
         return days;
     }
+
+
 }

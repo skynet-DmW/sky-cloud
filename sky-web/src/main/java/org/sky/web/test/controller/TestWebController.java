@@ -1,6 +1,6 @@
 package org.sky.web.test.controller;
 
-import org.sky.common.utils.Result;
+import org.sky.common.pojo.Result;
 import org.sky.web.feign.TestFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ public class TestWebController {
     @GetMapping("selectWeb/{id}")
     public ResponseEntity<Object> selectWeb(@PathVariable("id") String id) {
         String s = this.testFeignClient.select(id);
-        return ResponseEntity.ok(Result.setData(s));
+        return ResponseEntity.ok(Result.data(s));
     }
 
 

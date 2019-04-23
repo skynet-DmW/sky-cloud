@@ -1,0 +1,58 @@
+# tomcat
+server:
+  port: 8095
+  tomcat:
+    remote-ip-header: x-forward-for
+    uri-encoding: UTF-8
+    # 最大线程数
+    max-threads: 1000
+    max-http-header-size: 8096
+    # 设置tomcat的basedir
+    basedir: ${user.home}/tomcat/tmp
+    # 最大连接数
+    max-connections: 2000
+# spring
+spring:
+  application:
+    name: sky-gateway
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss # 如果使用字符串表示，用这行设置格式
+    timezone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false # 使用时间戳，使用数值timestamp表示日期
+  cloud:
+    gateway:
+      routes:
+      - id: web
+        uri: lb://sky-web
+        predicates:
+          - Path=/web/**
+        filters:
+        - StripPrefix=1
+      - id: server
+        uri: lb://sky-server
+        predicates:
+        - Path=/server/**
+        filters:
+        - StripPrefix=1
+
+# eureka
+eurekaServer:
+  host: localhost
+  user: admin
+  password: 123456
+  # eureka端口1
+  port1: 8091
+  # eureka端口2
+  port2: 8092
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eurekaServer.user}:${eurekaServer.password}@${eurekaServer.host}:${eurekaServer.port1}/eureka,http://${eurekaServer.user}:${eurekaServer.password}@${eurekaServer.host}:${eurekaServer.port2}/eureka
+
+# 日志
+logging:
+  level:
+    root: DEBUG
+  config: classpath:log/logback-spring-dev.xml

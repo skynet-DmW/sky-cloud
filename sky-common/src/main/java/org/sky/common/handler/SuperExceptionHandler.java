@@ -45,7 +45,7 @@ public class SuperExceptionHandler {
      */
     private ResponseEntity<Result> binding(BindingResult bindingResult) {
         String retVal = null;
-        while (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<ObjectError> allErrors = bindingResult.getAllErrors();
             for (ObjectError allError : allErrors) {
                 retVal = allError.getDefaultMessage();

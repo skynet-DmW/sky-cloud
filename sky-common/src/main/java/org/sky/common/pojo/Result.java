@@ -10,18 +10,11 @@ import java.io.Serializable;
  * @Date: 2018/12/19 13:26
  * @Description: 返回结果类
  */
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Result<T> implements Serializable {
 
     public static final long serialVersionUID = 42L;
-
-
-    /**
-     * 状态码
-     */
-    private int code;
-
 
     /**
      * 消息
@@ -41,20 +34,17 @@ public class Result<T> implements Serializable {
     private Long total;
 
 
-    public Result(int code, String msg) {
-        this.code = code;
+    public Result(String msg) {
         this.msg = msg;
     }
 
 
-    public Result(int code, T data) {
-        this.code = code;
+    public Result(T data) {
         this.data = data;
     }
 
 
-    public Result(int code, Long total, T data) {
-        this.code = code;
+    public Result(Long total, T data) {
         this.total = total;
         this.data = data;
     }
@@ -65,7 +55,7 @@ public class Result<T> implements Serializable {
      * @return
      */
     public static Result<String> successMsg() {
-        return new Result(Constants.ONE, Constants.SUCCESS);
+        return new Result(Constants.SUCCESS);
     }
 
 
@@ -74,7 +64,7 @@ public class Result<T> implements Serializable {
      * @return
      */
     public static Result<String> failMsg() {
-        return new Result(Constants.ZERO, Constants.FAIL);
+        return new Result(Constants.FAIL);
     }
 
 
@@ -85,7 +75,7 @@ public class Result<T> implements Serializable {
      * @return
      */
     public static Result<String> msg(String msg) {
-        return new Result(Constants.ZERO, msg);
+        return new Result(msg);
     }
 
 
@@ -95,7 +85,7 @@ public class Result<T> implements Serializable {
      * @return
      */
     public static<T> Result<T> data(T data) {
-        return new Result(Constants.ONE, data);
+        return new Result(data);
     }
 
 
@@ -105,6 +95,6 @@ public class Result<T> implements Serializable {
      * @return
      */
     public static<T> Result<T> data(Long total, T data) {
-        return new Result(Constants.ONE, total, data);
+        return new Result(total, data);
     }
 }

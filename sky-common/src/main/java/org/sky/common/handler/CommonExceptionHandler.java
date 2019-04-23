@@ -22,4 +22,11 @@ public class CommonExceptionHandler {
         return ResponseEntity.status(e.getCode()).body(Result.msg(e.getMsg()));
     }
 
+
+    @ExceptionHandler(value = Throwable.class)
+    @ResponseBody
+    public ResponseEntity<Result> handlerException(Throwable e){
+        log.error("捕捉到异常：{}", e.getMessage(), e);
+        return ResponseEntity.status(500).body(Result.msg(e.getMessage()));
+    }
 }

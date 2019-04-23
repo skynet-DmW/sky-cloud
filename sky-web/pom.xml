@@ -16,7 +16,7 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <!-- 注意此处的依赖是SpringBoot2.0以后专用的，如果您使用的SpringBoot版本低于2.0请使用spring-cloud-starter-eureka-server -->
-            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -55,6 +55,11 @@
             <groupId>org.sky.cloud</groupId>
             <artifactId>sky-common</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!-- zipkin-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
         </dependency>
     </dependencies>
 

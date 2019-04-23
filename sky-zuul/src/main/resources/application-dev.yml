@@ -2,11 +2,28 @@
 server:
   port: 8090
   tomcat:
+    remote-ip-header: x-forward-for
     uri-encoding: UTF-8
+    # 最大线程数
+    max-threads: 1000
+    max-http-header-size: 8096
+    # 设置tomcat的basedir
+    basedir: ${user.home}/tomcat/tmp
+    # 最大连接数
+    max-connections: 2000
 # spring
 spring:
   application:
     name: sky-zuul
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss # 如果使用字符串表示，用这行设置格式
+    timezone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false # 使用时间戳，使用数值timestamp表示日期
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: true # 开启重试
 
 # eureka
 eurekaServer:
@@ -25,29 +42,49 @@ eureka:
 
 # zuul
 zuul:
+  ignored-services: '*' #忽略所有未配置的service,每一个微服务的路由配置都需要配置
   routes:
-    sso:
+    web:
       path: /web/**
       serviceId: sky-web
-    trace:
+    server:
       path: /server/**
       serviceId: sky-server
-   # 不过滤ccokie
-  sensitive-headers: true
   # 开启重试机制
   retryable: true
-  host:
-    connect-timeout-millis: 10000
-    socket-timeout-millis: 60000
+  max:
+    host:
+      connections: 2000
+  ribbon:
+    eager-load:
+      enabled: true
 
-# hystrix
+# 负载均衡，多个以英文逗号隔开。如：http://192.168.8.101:8093,http://192.168.8.102:8093
+sky-web:
+  ribbon:
+    listOfServers: http://localhost:8093
+sky-server:
+  ribbon:
+    listOfServers: http://localhost:8095
+
+# ribbon
+ribbon:
+  ReadTimeout: 4000 # 请求处理的超时时间
+  ConnectTimeout: 4000 # 请求连接的超时时间
+  MaxAutoRetries: 1 # 对当前实例的重试次数
+  MaxAutoRetriesNextServer: 3 # 切换实例的重试次数
+  okToRetryOnAllOperations: true # 对所有操作请求都进行重试
+  eager-load:
+    enabled: true
+
+# hystrix的超时时间必须大于ribbon的超时时间
 hystrix:
   command:
     default:
       execution:
         isolation:
           thread:
-            timeoutInMilliseconds: 60000
+            timeoutInMilliseconds: 5000
 
 # 日志
 logging:

@@ -11,7 +11,4 @@ public class Constants {
 
     public static final String FAIL = "失败";
 
-    public static final int ONE = 1;
-
-    public static final int ZERO = 0;
 }

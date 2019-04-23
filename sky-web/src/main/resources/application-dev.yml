@@ -2,40 +2,65 @@
 server:
   port: 8093
   tomcat:
+    remote-ip-header: x-forward-for
     uri-encoding: UTF-8
+    # 最大线程数
+    max-threads: 1000
+    max-http-header-size: 8096
+    # 设置tomcat的basedir
+    basedir: ${user.home}/tomcat/tmp
+    # 最大连接数
+    max-connections: 2000
 # spring
 spring:
   application:
     name: sky-web
-
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss # 如果使用字符串表示，用这行设置格式
+    timezone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false # 使用时间戳，使用数值timestamp表示日期
   # redis
   redis:
     # Redis服务器地址
-    host: 47.100.183.36
+    host: 192.168.8.114
     # Redis服务器连接端口
     port: 6379
     # 密码
-    password:
+    password: honest1101
     # 连接超时时间（毫秒）
-    timeout: 0
-    jedis:
-      pool:
-        # 连接池最大连接数（使用负值表示没有限制）
-        max-active: 8
-        # 连接池最大阻塞等待时间（使用负值表示没有限制）
-        max-wait: -1
-        # 连接池中的最大空闲连接
-        max-idle: 8
-        # 连接池中的最小空闲连接
-        min-idle: 0
+    timeout: 10000
+    # db
+    index: 1
+    # 可用的最大连接实例数 默认为8（使用负值表示没有限制）
+    max-total: 1024
+    # 连接池最大阻塞等待时间（使用负值表示没有限制）
+    max-wait-millis: 10000
+    # 连接池中的最大空闲连接
+    max-idle: 200
+    # 连接池中的最小空闲连接
+    min-idle: 0
+    # 连接最小空闲时间(毫秒)
+    min-evictable-idle-time-millis: 1800000
+    # 释放连接的扫描间隔（毫秒）
+    time-between-eviction-runs-millis: 30000
+    # 每次释放连接的最大数目
+    num-tests-per-eviction-run: 1024
 
   # RabbitMQ
   rabbitmq:
-    addresses: 47.100.183.36
+    addresses: 192.168.8.114
     port: 5672
     username: admin
-    password: 123456
+    password: honest1101
     virtual-host: /
+
+  # zipkin
+  zipkin:
+    base-url: http://localhost:8097
+    sleuth:
+      sampler:
+        percentage: 1.0 # 监控的百分比，默认的是0.1表示10%，这里给1.0表示全部监控
 
 # eureka
 eurekaServer:
@@ -51,11 +76,30 @@ eureka:
   client:
     service-url:
       defaultZone: http://${eurekaServer.user}:${eurekaServer.password}@${eurekaServer.host}:${eurekaServer.port1}/eureka,http://${eurekaServer.user}:${eurekaServer.password}@${eurekaServer.host}:${eurekaServer.port2}/eureka
+  instance:
+    # 每间隔1s，向服务端发送一次心跳，证明自己依然”存活“ 测试开启
+    lease-renewal-interval-in-seconds: 1
+    # 告诉服务端，如果我2s之内没有给你发心跳，就代表我“死”了，将我踢出掉。测试开启
+    lease-expiration-duration-in-seconds: 2
+    prefer-ip-address: true # 以IP地址注册到服务中心，相互注册使用IP地址
 
 # feign开启Hystrix
 feign:
   hystrix:
     enabled: true
+# Feign超时时间
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+# 饥饿加载
+ribbon:
+  eager-load:
+    enabled: true
+    clients: sky-server
 
 # 日志
 logging:

@@ -1,0 +1,51 @@
+# tomcat
+server:
+  port: 8097
+  tomcat:
+    remote-ip-header: x-forward-for
+    uri-encoding: UTF-8
+    # 最大线程数
+    max-threads: 1000
+    max-http-header-size: 8096
+    # 设置tomcat的basedir
+    basedir: ${user.home}/tomcat/tmp
+    # 最大连接数
+    max-connections: 2000
+# spring
+spring:
+  application:
+    name: sky-zipkin
+
+management:
+  metrics:
+    web:
+      server:
+        auto-time-requests: false
+
+# eureka
+eurekaServer:
+  host: localhost
+  user: admin
+  password: 123456
+  # eureka端口1
+  port1: 8091
+  # eureka端口2
+  port2: 8092
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eurekaServer.user}:${eurekaServer.password}@${eurekaServer.host}:${eurekaServer.port1}/eureka,http://${eurekaServer.user}:${eurekaServer.password}@${eurekaServer.host}:${eurekaServer.port2}/eureka
+  instance:
+    # 每间隔1s，向服务端发送一次心跳，证明自己依然”存活“
+    lease-renewal-interval-in-seconds: 1
+    # 告诉服务端，如果我2s之内没有给你发心跳，就代表我“死”了，将我踢出掉。
+    lease-expiration-duration-in-seconds: 2
+    prefer-ip-address: true # 以IP地址注册到服务中心，相互注册使用IP地址
+    instance-id: ${spring.application.name}:${server.port}
+
+# 日志
+logging:
+  level:
+    root: DEBUG
+  config: classpath:log/logback-spring-dev.xml

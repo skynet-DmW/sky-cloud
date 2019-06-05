@@ -2,7 +2,10 @@ package org.sky.common.utils;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.sky.common.exception.CommonException;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +21,7 @@ public class POIUtils {
 
     /**
      * 导出Excel
+     *
      * @param title
      * @param headers
      * @param data
@@ -54,20 +58,20 @@ public class POIUtils {
             wb.close();
             stream.close();
         } catch (IOException e) {
-            log.error("销账单导出错误：{}，信息：{}", e, e.getMessage());
+            log.error("导出错误：{}，信息：{}", e, e.getMessage());
         } finally {
             if (wb != null) {
                 try {
                     wb.close();
                 } catch (IOException e) {
-                    log.error("销账单导出错误：{}，信息：{}", e, e.getMessage());
+                    log.error("导出错误：{}，信息：{}", e, e.getMessage());
                 }
             }
             if (stream != null) {
                 try {
                     stream.close();
                 } catch (IOException e) {
-                    log.error("销账单导出错误：{}，信息：{}", e, e.getMessage());
+                    log.error("导出错误：{}，信息：{}", e, e.getMessage());
                 }
             }
         }
@@ -77,6 +81,7 @@ public class POIUtils {
 
     /**
      * 获取Excel样式（边框、背景色）
+     *
      * @return
      */
     public static CellStyle getCellStyle(Workbook workbook) {
@@ -100,6 +105,7 @@ public class POIUtils {
 
     /**
      * 获取Excel样式（仅边框）
+     *
      * @return
      */
     public static CellStyle getBorderCellStyle(Workbook workbook) {
@@ -118,12 +124,73 @@ public class POIUtils {
 
 
     /**
+     * 获取普通单元格数据
+     *
+     * @param cell
+     * @return
+     */
+    public static String getCellValue(Cell cell) {
+        CellType type = cell.getCellType();
+        switch (type) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+        }
+        return null;
+    }
+
+
+    /**
+     * 获取合并或者普通单元格的值
+     *
+     * @param row
+     * @param column
+     * @return
+     */
+    public static String getCellValue(Row row, int column) {
+        Sheet sheet = row.getSheet();
+        int rowNum = row.getRowNum();
+        int sheetMergeCount = sheet.getNumMergedRegions();
+        for (int i = 0; i < sheetMergeCount; i++) {
+            CellRangeAddress ca = sheet.getMergedRegion(i);
+            int firstColumn = ca.getFirstColumn();
+            int lastColumn = ca.getLastColumn();
+            int firstRow = ca.getFirstRow();
+            int lastRow = ca.getLastRow();
+            if (rowNum >= firstRow && rowNum <= lastRow) {
+                if (column >= firstColumn && column <= lastColumn) {
+                    Row fRow = sheet.getRow(firstRow);
+                    Cell fCell = fRow.getCell(firstColumn);
+                    return getCellValue(fCell);
+                }
+            }
+        }
+        return getCellValue(row.getCell(column));
+    }
+
+
+    /**
+     * 校验是否是Excel文件
+     *
+     * @param fileName
+     * @throws CommonException
+     */
+    public static void checkFile(String fileName) throws CommonException {
+        if (!StringUtils.isEmpty(fileName) && !(fileName.endsWith(".xlsx"))) {
+            throw new CommonException(400, "不是.xlsx文件！");
+        }
+    }
+
+
+    /**
      * 回调接口
      */
     public interface ExcelData {
 
         /**
          * 设置数据
+         *
          * @param wb
          * @return
          */

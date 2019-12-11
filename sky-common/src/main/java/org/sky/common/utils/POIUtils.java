@@ -8,6 +8,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.sky.common.exception.CommonException;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -27,16 +28,16 @@ public class POIUtils {
      * @param data
      * @return
      */
-    public static Workbook exportExcel(Workbook wb, String title, String[] headers, ExcelData data, HttpServletResponse response) {
+    public static Workbook exportExcel(Workbook wb, String title, String[] headers, ExcelData data, HttpServletRequest request, HttpServletResponse response) {
         Sheet sheet = wb.createSheet(title);
-        Row row0 = sheet.createRow(0);
+        Row row = sheet.createRow(0);
         // 获取样式
         CellStyle cellStyle = getCellStyle(wb);
         // 标题、第一行信息
         for (int i = 0; i < headers.length; i++) {
             // 默认宽度是2048
             sheet.setColumnWidth(i, 4096);
-            Cell cell = row0.createCell(i);
+            Cell cell = row.createCell(i);
             cell.setCellValue(headers[i]);
             cell.setCellStyle(cellStyle);
         }
@@ -46,6 +47,9 @@ public class POIUtils {
         ServletOutputStream stream = null;
         // 清空输出流
         response.reset();
+        response.addHeader("Access-Control-Allow-Origin", request.getHeader("origin"));
+        response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+        response.addHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Content-disposition", String.format("attachment; filename=\"%s\"", flieName));
         // web浏览通过MIME类型判断文件是excel类型
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
